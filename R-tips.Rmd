@@ -1,0 +1,11 @@
+---
+title: "R-Tips Notebook"
+output: html_notebook
+---
+
+##Useful Links
+
+*  [R for Data Science]()
+*  [Definitive Guide to Notebooks/Markdown](https://bookdown.org/yihui/rmarkdown/markdown-syntax.html) 
+*  [R Markdown Templates](https://github.com/dr-harper/example-rmd-templates)
+*  [Github with Rstudio](http://happygitwithr.com/rstudio-git-github.html)
