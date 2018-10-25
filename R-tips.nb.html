@@ -179,15 +179,153 @@ $(document).ready(function () {
 <div id="useful-links" class="section level2">
 <h2>Useful Links</h2>
 <ul>
-<li><a href>R for Data Science</a></li>
+<li><a href="https://r4ds.had.co.nz/">R for Data Science</a></li>
 <li><a href="https://bookdown.org/yihui/rmarkdown/markdown-syntax.html">Definitive Guide to Notebooks/Markdown</a></li>
+<li><a href="http://yihui.name/knitr/options/">knitr options</a></li>
 <li><a href="https://github.com/dr-harper/example-rmd-templates">R Markdown Templates</a></li>
 <li><a href="http://happygitwithr.com/rstudio-git-github.html">Github with Rstudio</a></li>
+<li><a href="https://crsh.github.io/papaja_man/index.html">papaja</a></li>
 </ul>
+</div>
+<div id="example" class="section level2">
+<h2>Example</h2>
+<p>First, load in all necessary packages as well as the data.</p>
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuICAjc2VjdGlvbiAyLjYuMSBvZiBEZWZpbml0aXZlIEd1aWRlXG5saWJyYXJ5KGxhdmFhbilcbmxpYnJhcnkodGlkeXZlcnNlKSAjbWFuYWdpbmcgZGF0YVxubGlicmFyeShicm9vbSkgI2NsZWFuaW5nIG91dHB1dFxubGlicmFyeShzZW1QbG90KSAjY3JlYXRpbmcgcGF0aCBkaWFncmFtc1xubGlicmFyeShzalBsb3QpICNmb3IgcGxvdHRpbmcgdGhpbmdzXG5kZjwtcmVhZC5jc3YoXCJFQ0xTSzIwMTEgUFNZQyA1MDEuY3N2XCIpXG5gYGAifQ== -->
+<pre class="r"><code>  #section 2.6.1 of Definitive Guide
+library(lavaan)
+library(tidyverse) #managing data
+library(broom) #cleaning output
+library(semPlot) #creating path diagrams
+library(sjPlot) #for plotting things
+df&lt;-read.csv(&quot;ECLSK2011 PSYC 501.csv&quot;)</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<p>We will be using an example right from class. Examining a quadratic growth model.</p>
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuZ2MucS5tYXRoPC1cIlxuaT1+IDEqeDJfbWF0aCArIDEqeDRfbWF0aCArIDEqeDZfbWF0aCArIDEqeDdfbWF0aCArIDEqeDhfbWF0aFxuc2w9fiAwKngyX21hdGggKyAxKng0X21hdGggKyAyKng2X21hdGggKyAzKng3X21hdGggKyA0Kng4X21hdGhcbnNxPX4gMCp4Ml9tYXRoICsgMSp4NF9tYXRoICsgNCp4Nl9tYXRoICsgOSp4N19tYXRoICsgMTYqeDhfbWF0aFxuXCJcbmdjLnEubWF0aC5maXQ8LWdyb3d0aChnYy5xLm1hdGgsZGF0YT1kZiwgbWlzc2luZz1cImZpbWxcIilcbnN1bW1hcnkoZ2MucS5tYXRoLmZpdCwgZml0Lm1lYXN1cmVzPVQsIHN0YW5kYXJkaXplZD1UKVxuYGBgIn0= -->
+<pre class="r"><code>gc.q.math&lt;-&quot;
+i=~ 1*x2_math + 1*x4_math + 1*x6_math + 1*x7_math + 1*x8_math
+sl=~ 0*x2_math + 1*x4_math + 2*x6_math + 3*x7_math + 4*x8_math
+sq=~ 0*x2_math + 1*x4_math + 4*x6_math + 9*x7_math + 16*x8_math
+&quot;
+gc.q.math.fit&lt;-growth(gc.q.math,data=df, missing=&quot;fiml&quot;)
+summary(gc.q.math.fit, fit.measures=T, standardized=T)</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<p>The output can be somewhat difficult to manage. That is where the <code>broom</code> package comes into play using the <code>tidy()</code> function.</p>
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuXG50aWR5Z3JvdyA8LSB0aWR5KGdjLnEubWF0aC5maXQpXG4jVmlldyh0aWR5Z3JvdylcblxuI0NyZWF0ZSBkZiB0byByZWZsZWN0IGp1c3QgZXN0aW1hdGVzXG5lc3QgPC0gdGlkeWdyb3cgJT4lXG4gIGZpbHRlcihzdGQuZXJyb3I+MCkgJT4lXG4gIGZpbHRlcighZ3JlcGwoJ21hdGgnLCB0ZXJtKSkgJT4lICNyZW1vdmVzIGFsbCB0ZXJtcyB0aGF0IGhhdmUgJ21hdGgnIGluIHRoZSBuYW1lXG4gIGZpbHRlcighZ3JlcGwoJ35+Jyx0ZXJtKSkgJT4lICN0aGlzIGlzIHRoZSBsaW5lIHRoYXQgZXZhbHVhdGVzIHRoZSBvcCB2YXJpYWJsZVxuICBzZWxlY3QodGVybSwgZXN0aW1hdGUsIHN0ZC5lcnJvciwgcC52YWx1ZSwgc3RkLmFsbClcblxuI2NyZWF0ZSBkZiB0byByZWZsZWN0IG9ubHkgdmFyaWFuY2VcbnZhciA8LSB0aWR5Z3JvdyAlPiVcbiAgZmlsdGVyKHN0ZC5lcnJvcj4wKSAlPiVcbiAgZmlsdGVyKCFncmVwbCgnbWF0aCcsIHRlcm0pKSAlPiVcbiAgZmlsdGVyKGdyZXBsKCd+ficsIHRlcm0pKSAlPiVcbiAgc2VsZWN0KHRlcm0sIGVzdGltYXRlLCBzdGQuZXJyb3IsIHAudmFsdWUsIHN0ZC5hbGwpICU+JVxuICBzbGljZSgxOjMpICNvbmx5IHdhbnQgdGhlIHZhcmlhbmNlXG5cbiNDb21iaW5lIGRhdGFmcmFtZXNcbnJlcy5xZyA8LSBiaW5kX2NvbHMoZXN0LHZhcikgJT4lXG4gIHNlbGVjdCh0ZXJtLCBlc3RpbWF0ZSwgc3RkLmVycm9yLCBzdGQuYWxsLCBwLnZhbHVlLCBlc3RpbWF0ZTEsIHAudmFsdWUxKVxuXG5yb3duYW1lcyhyZXMucWcpIDwtIGMoJ0ludGVyY2VwdCcsJ0xpbmVhciBTbG9wZScsJ1F1YWRyYXRpYyBTbG9wZScpXG5cbiNyb3VuZGluZyB0aGUgZXN0aW1hdGVzXG5yZXMucWckZXN0aW1hdGUgPC0gcm91bmQocmVzLnFnJGVzdGltYXRlLCAzKVxucmVzLnFnJHN0ZC5lcnJvciA8LSByb3VuZChyZXMucWckc3RkLmVycm9yLCAzKVxucmVzLnFnJHN0ZC5hbGwgPC0gcm91bmQocmVzLnFnJHN0ZC5hbGwsIDMpXG5yZXMucWckZXN0aW1hdGUxIDwtIHJvdW5kKHJlcy5xZyRlc3RpbWF0ZTEsIDMpXG5cbnJlcy5xZyA8LSByb3duYW1lc190b19jb2x1bW4ocmVzLnFnKSAlPiVcbiAgc2VsZWN0KHJvd25hbWUsIGVzdGltYXRlLCBzdGQuZXJyb3IsIHN0ZC5hbGwsIHAudmFsdWUsIGVzdGltYXRlMSwgcC52YWx1ZTEpXG5cbm5hbWVzKHJlcy5xZykgPC0gYygnJywgJ0VzdGltYXRlJywgJ1N0ZC4gRXJyb3InLCAnU3RkLiBFc3QuJywgJ3AtdmFsdWUnLCBcbiAgICAgICAgICAgICAgICAgICAnVmFyaWFuY2UnLCdwLXZhbHVlJylcbnRhYl9kZihyZXMucWcsIHRpdGxlPSdRdWFkcmF0aWMgUGFyYW1ldGVyIEVzdGltYXRlcycsXG4gICAgICAgZmlsZT0nUXVhZFBhcmFtLmh0bWwnKVxuXG5gYGAifQ== -->
+<pre class="r"><code>
+tidygrow &lt;- tidy(gc.q.math.fit)
+#View(tidygrow)
+
+#Create df to reflect just estimates
+est &lt;- tidygrow %&gt;%
+  filter(std.error&gt;0) %&gt;%
+  filter(!grepl('math', term)) %&gt;% #removes all terms that have 'math' in the name
+  filter(!grepl('~~',term)) %&gt;% #this is the line that evaluates the op variable
+  select(term, estimate, std.error, p.value, std.all)
+
+#create df to reflect only variance
+var &lt;- tidygrow %&gt;%
+  filter(std.error&gt;0) %&gt;%
+  filter(!grepl('math', term)) %&gt;%
+  filter(grepl('~~', term)) %&gt;%
+  select(term, estimate, std.error, p.value, std.all) %&gt;%
+  slice(1:3) #only want the variance
+
+#Combine dataframes
+res.qg &lt;- bind_cols(est,var) %&gt;%
+  select(term, estimate, std.error, std.all, p.value, estimate1, p.value1)
+
+rownames(res.qg) &lt;- c('Intercept','Linear Slope','Quadratic Slope')
+
+#rounding the estimates
+res.qg$estimate &lt;- round(res.qg$estimate, 3)
+res.qg$std.error &lt;- round(res.qg$std.error, 3)
+res.qg$std.all &lt;- round(res.qg$std.all, 3)
+res.qg$estimate1 &lt;- round(res.qg$estimate1, 3)
+
+res.qg &lt;- rownames_to_column(res.qg) %&gt;%
+  select(rowname, estimate, std.error, std.all, p.value, estimate1, p.value1)
+
+names(res.qg) &lt;- c('', 'Estimate', 'Std. Error', 'Std. Est.', 'p-value', 
+                   'Variance','p-value')
+tab_df(res.qg, title='Quadratic Parameter Estimates',
+       file='QuadParam.html')
+</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxucXVhZCA8LSBhcy5kYXRhLmZyYW1lKGZpdG1lYXN1cmVzKGdjLnEubWF0aC5maXQsIGMoXCJjZmlcIixcInNybXJcIixcInJtc2VhXCIpKSlcbm5hbWVzKHF1YWQpWzFdPC1cIlF1YWRyYXRpYyBHcm93dGhcIlxucXVhZCRpbmRleCA8LSBOQVxucXVhZFsxLDJdPC1cIkNGSVwiXG5xdWFkWzIsMl08LVwiU1JNUlwiXG5xdWFkWzMsMl08LVwiUk1TRUFcIlxucXVhZFs0LDJdPC1cIkFJQ1wiXG5xdWFkWzQsMV08LUFJQyhnYy5xLm1hdGguZml0KVxucXVhZFs1LDJdPC1cIkJJQ1wiXG5xdWFkWzUsMV08LUJJQyhnYy5xLm1hdGguZml0KVxucXVhZCRgUXVhZHJhdGljIEdyb3d0aGAgPC0gcm91bmQocXVhZCRgUXVhZHJhdGljIEdyb3d0aGAsMylcbnRhYl9kZihxdWFkLCB0aXRsZT0nUXVhZHJhdGljIEdyb3d0aCBGaXQgU3RhdHMnLCBcbiAgICAgICBmaWxlID0gJ1F1YWRGaXQuaHRtbCcpXG5gYGAifQ== -->
+<pre class="r"><code>quad &lt;- as.data.frame(fitmeasures(gc.q.math.fit, c(&quot;cfi&quot;,&quot;srmr&quot;,&quot;rmsea&quot;)))
+names(quad)[1]&lt;-&quot;Quadratic Growth&quot;
+quad$index &lt;- NA
+quad[1,2]&lt;-&quot;CFI&quot;
+quad[2,2]&lt;-&quot;SRMR&quot;
+quad[3,2]&lt;-&quot;RMSEA&quot;
+quad[4,2]&lt;-&quot;AIC&quot;
+quad[4,1]&lt;-AIC(gc.q.math.fit)
+quad[5,2]&lt;-&quot;BIC&quot;
+quad[5,1]&lt;-BIC(gc.q.math.fit)
+quad$`Quadratic Growth` &lt;- round(quad$`Quadratic Growth`,3)
+tab_df(quad, title='Quadratic Growth Fit Stats', 
+       file = 'QuadFit.html')</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<hr />
+<div id="sample-text-with-code" class="section level3">
+<h3>Sample Text with Code</h3>
+<p>Here we can also begin to integrate some of the R code into our text. Example:</p>
+<p>The model showed good fit based on most fit measures (CFI = 0.983, RMSEA = 0.056 and SRMR = 0.112).</p>
+</div>
+<div id="correlation-table" class="section level3">
+<h3>Correlation Table</h3>
+<p>Now we know that it is always good to include a correlation table into our manuscripts. But we often forget them until the final piece because we don’t want to have to transfer everything over! Who would want to do that (is that what undergrad RA’s are for??)</p>
+<p>This is now a thing of the past! R can do it for you.</p>
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjpbIiNEb24ndCBuZWVkIGFsbCBvZiB0aGUgdmFyaWFibGVzOyBvbmx5IHNlbGVjdCB0aGUgb25lcyB5b3Ugd2lsbCBiZSB1c2luZyAiLCIiLCJjb3IgPC0gc2VsZWN0KGRmLCB4MV9TRVM6eDhfd2dodCkiLCIiLCIjVGhpcyBjb3JyZWxhdGlvbiBtYXRyaXggaXMgdG9vIGxhcmdlIGZvciB0aGUgcm1hcmtkb3duIGRvY3VtZW50LiBQbGVhc2UgZmluZCBpdCBpbiB0aGUgZm9sZGVyIHRpdGxlZCBcImNvcnJlbGF0aW9uLmh0bWxcIiIsIiIsInNqdC5jb3JyKGNvcixzaG93LnAgPSBGQUxTRSwgbmEuZGVsZXRpb24gPSAncGFpcndpc2UnLCB0cmlhbmdsZT1cInVwcGVyXCIsICIsIiAgICAgICAgICAgdGl0bGUgPSBcIkNvcnJlbGF0aW9uc1wiLCIsIiAgICAgICAgICAgQ1NTPWxpc3QoY3NzLnRoZWFkPVwiYm9yZGVyLXRvcDpkb3VibGUgYmxhY2s7IGZvbnQtd2VpZ2h0Om5vcm1hbDsgZm9udC1zaXplOjAuOWVtO1wiLCIsIiAgICAgICAgIGNzcy5maXJzdHRhYmxlY29sPVwiZm9udC13ZWlnaHQ6bm9ybWFsOyBmb250LXNpemU6MC45ZW07XCIpLGZpbGU9XCJDb3JyZWxhdGlvbi5odG1sXCIpIl19 -->
+<pre class="r"><code>#Don't need all of the variables; only select the ones you will be using 
+
+cor &lt;- select(df, x1_SES:x8_wght)
+
+#This correlation matrix is too large for the rmarkdown document. Please find it in the folder titled &quot;correlation.html&quot;
+
+sjt.corr(cor,show.p = FALSE, na.deletion = 'pairwise', triangle=&quot;upper&quot;, 
+           title = &quot;Correlations&quot;,
+           CSS=list(css.thead=&quot;border-top:double black; font-weight:normal; font-size:0.9em;&quot;,
+         css.firsttablecol=&quot;font-weight:normal; font-size:0.9em;&quot;),file=&quot;Correlation.html&quot;)</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+</div>
+<div id="plots" class="section level3">
+<h3>Plots</h3>
+<p>It is always great to visualize your model. The package <a href="http://sachaepskamp.com/documentation/semPlot/semPaths.html">semPlot</a> can come in very handy. Let’s take a look:</p>
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuXG5zZW1QYXRocyhnYy5xLm1hdGguZml0LCBsYXlvdXQ9J3RyZWUyJylcblxuYGBgIn0= -->
+<pre class="r"><code>
+semPaths(gc.q.math.fit, layout='tree2')
+</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
 <!-- rnb-text-end -->
 </div>
+</div>
 
-<div id="rmd-source-code">LS0tDQp0aXRsZTogIlItVGlwcyBOb3RlYm9vayINCm91dHB1dDogaHRtbF9ub3RlYm9vaw0KLS0tDQoNCiMjVXNlZnVsIExpbmtzDQoNCiogIFtSIGZvciBEYXRhIFNjaWVuY2VdKCkNCiogIFtEZWZpbml0aXZlIEd1aWRlIHRvIE5vdGVib29rcy9NYXJrZG93bl0oaHR0cHM6Ly9ib29rZG93bi5vcmcveWlodWkvcm1hcmtkb3duL21hcmtkb3duLXN5bnRheC5odG1sKSANCiogIFtSIE1hcmtkb3duIFRlbXBsYXRlc10oaHR0cHM6Ly9naXRodWIuY29tL2RyLWhhcnBlci9leGFtcGxlLXJtZC10ZW1wbGF0ZXMpDQoqICBbR2l0aHViIHdpdGggUnN0dWRpb10oaHR0cDovL2hhcHB5Z2l0d2l0aHIuY29tL3JzdHVkaW8tZ2l0LWdpdGh1Yi5odG1sKQ==</div>
+<div id="rmd-source-code">LS0tDQp0aXRsZTogIlItVGlwcyBOb3RlYm9vayINCm91dHB1dDoNCiAgaHRtbF9kb2N1bWVudDoNCiAgICBkZl9wcmludDogcGFnZWQNCi0tLQ0KDQojI1VzZWZ1bCBMaW5rcw0KDQoqICBbUiBmb3IgRGF0YSBTY2llbmNlXShodHRwczovL3I0ZHMuaGFkLmNvLm56LykNCiogIFtEZWZpbml0aXZlIEd1aWRlIHRvIE5vdGVib29rcy9NYXJrZG93bl0oaHR0cHM6Ly9ib29rZG93bi5vcmcveWlodWkvcm1hcmtkb3duL21hcmtkb3duLXN5bnRheC5odG1sKSANCiogIFtrbml0ciBvcHRpb25zXShodHRwOi8veWlodWkubmFtZS9rbml0ci9vcHRpb25zLykNCiogIFtSIE1hcmtkb3duIFRlbXBsYXRlc10oaHR0cHM6Ly9naXRodWIuY29tL2RyLWhhcnBlci9leGFtcGxlLXJtZC10ZW1wbGF0ZXMpDQoqICBbR2l0aHViIHdpdGggUnN0dWRpb10oaHR0cDovL2hhcHB5Z2l0d2l0aHIuY29tL3JzdHVkaW8tZ2l0LWdpdGh1Yi5odG1sKQ0KKiAgW3BhcGFqYV0oaHR0cHM6Ly9jcnNoLmdpdGh1Yi5pby9wYXBhamFfbWFuL2luZGV4Lmh0bWwpDQoNCg0KIyNFeGFtcGxlDQoNCkZpcnN0LCBsb2FkIGluIGFsbCBuZWNlc3NhcnkgcGFja2FnZXMgYXMgd2VsbCBhcyB0aGUgZGF0YS4gIA0KDQpgYGB7ciBMaWJyYXJpZXMsIG1lc3NhZ2U9Rn0NCiAgI3NlY3Rpb24gMi42LjEgb2YgRGVmaW5pdGl2ZSBHdWlkZQ0KbGlicmFyeShsYXZhYW4pDQpsaWJyYXJ5KHRpZHl2ZXJzZSkgI21hbmFnaW5nIGRhdGENCmxpYnJhcnkoYnJvb20pICNjbGVhbmluZyBvdXRwdXQNCmxpYnJhcnkoc2VtUGxvdCkgI2NyZWF0aW5nIHBhdGggZGlhZ3JhbXMNCmxpYnJhcnkoc2pQbG90KSAjZm9yIHBsb3R0aW5nIHRoaW5ncw0KZGY8LXJlYWQuY3N2KCJFQ0xTSzIwMTEgUFNZQyA1MDEuY3N2IikNCmBgYA0KDQpXZSB3aWxsIGJlIHVzaW5nIGFuIGV4YW1wbGUgcmlnaHQgZnJvbSBjbGFzcy4gRXhhbWluaW5nIGEgcXVhZHJhdGljIGdyb3d0aCBtb2RlbC4gIA0KDQpgYGB7ciBRdWFkcmF0aWMgR3Jvd3RofQ0KZ2MucS5tYXRoPC0iDQppPX4gMSp4Ml9tYXRoICsgMSp4NF9tYXRoICsgMSp4Nl9tYXRoICsgMSp4N19tYXRoICsgMSp4OF9tYXRoDQpzbD1+IDAqeDJfbWF0aCArIDEqeDRfbWF0aCArIDIqeDZfbWF0aCArIDMqeDdfbWF0aCArIDQqeDhfbWF0aA0Kc3E9fiAwKngyX21hdGggKyAxKng0X21hdGggKyA0Kng2X21hdGggKyA5Kng3X21hdGggKyAxNip4OF9tYXRoDQoiDQpnYy5xLm1hdGguZml0PC1ncm93dGgoZ2MucS5tYXRoLGRhdGE9ZGYsIG1pc3Npbmc9ImZpbWwiKQ0Kc3VtbWFyeShnYy5xLm1hdGguZml0LCBmaXQubWVhc3VyZXM9VCwgc3RhbmRhcmRpemVkPVQpDQpgYGANCg0KDQoNClRoZSBvdXRwdXQgY2FuIGJlIHNvbWV3aGF0IGRpZmZpY3VsdCB0byBtYW5hZ2UuIFRoYXQgaXMgd2hlcmUgdGhlIGBicm9vbWAgcGFja2FnZSBjb21lcyBpbnRvIHBsYXkgdXNpbmcgdGhlIGB0aWR5KClgIGZ1bmN0aW9uLiANCg0KDQpgYGB7ciBUaWR5IHF1YWRyYXRpYyBncm93dGh9DQoNCnRpZHlncm93IDwtIHRpZHkoZ2MucS5tYXRoLmZpdCkNCiNWaWV3KHRpZHlncm93KQ0KDQojQ3JlYXRlIGRmIHRvIHJlZmxlY3QganVzdCBlc3RpbWF0ZXMNCmVzdCA8LSB0aWR5Z3JvdyAlPiUNCiAgZmlsdGVyKHN0ZC5lcnJvcj4wKSAlPiUNCiAgZmlsdGVyKCFncmVwbCgnbWF0aCcsIHRlcm0pKSAlPiUgI3JlbW92ZXMgYWxsIHRlcm1zIHRoYXQgaGF2ZSAnbWF0aCcgaW4gdGhlIG5hbWUNCiAgZmlsdGVyKCFncmVwbCgnfn4nLHRlcm0pKSAlPiUgI3RoaXMgaXMgdGhlIGxpbmUgdGhhdCBldmFsdWF0ZXMgdGhlIG9wIHZhcmlhYmxlDQogIHNlbGVjdCh0ZXJtLCBlc3RpbWF0ZSwgc3RkLmVycm9yLCBwLnZhbHVlLCBzdGQuYWxsKQ0KDQojY3JlYXRlIGRmIHRvIHJlZmxlY3Qgb25seSB2YXJpYW5jZQ0KdmFyIDwtIHRpZHlncm93ICU+JQ0KICBmaWx0ZXIoc3RkLmVycm9yPjApICU+JQ0KICBmaWx0ZXIoIWdyZXBsKCdtYXRoJywgdGVybSkpICU+JQ0KICBmaWx0ZXIoZ3JlcGwoJ35+JywgdGVybSkpICU+JQ0KICBzZWxlY3QodGVybSwgZXN0aW1hdGUsIHN0ZC5lcnJvciwgcC52YWx1ZSwgc3RkLmFsbCkgJT4lDQogIHNsaWNlKDE6MykgI29ubHkgd2FudCB0aGUgdmFyaWFuY2UNCg0KI0NvbWJpbmUgZGF0YWZyYW1lcw0KcmVzLnFnIDwtIGJpbmRfY29scyhlc3QsdmFyKSAlPiUNCiAgc2VsZWN0KHRlcm0sIGVzdGltYXRlLCBzdGQuZXJyb3IsIHN0ZC5hbGwsIHAudmFsdWUsIGVzdGltYXRlMSwgcC52YWx1ZTEpDQoNCnJvd25hbWVzKHJlcy5xZykgPC0gYygnSW50ZXJjZXB0JywnTGluZWFyIFNsb3BlJywnUXVhZHJhdGljIFNsb3BlJykNCg0KI3JvdW5kaW5nIHRoZSBlc3RpbWF0ZXMNCnJlcy5xZyRlc3RpbWF0ZSA8LSByb3VuZChyZXMucWckZXN0aW1hdGUsIDMpDQpyZXMucWckc3RkLmVycm9yIDwtIHJvdW5kKHJlcy5xZyRzdGQuZXJyb3IsIDMpDQpyZXMucWckc3RkLmFsbCA8LSByb3VuZChyZXMucWckc3RkLmFsbCwgMykNCnJlcy5xZyRlc3RpbWF0ZTEgPC0gcm91bmQocmVzLnFnJGVzdGltYXRlMSwgMykNCg0KcmVzLnFnIDwtIHJvd25hbWVzX3RvX2NvbHVtbihyZXMucWcpICU+JQ0KICBzZWxlY3Qocm93bmFtZSwgZXN0aW1hdGUsIHN0ZC5lcnJvciwgc3RkLmFsbCwgcC52YWx1ZSwgZXN0aW1hdGUxLCBwLnZhbHVlMSkNCg0KbmFtZXMocmVzLnFnKSA8LSBjKCcnLCAnRXN0aW1hdGUnLCAnU3RkLiBFcnJvcicsICdTdGQuIEVzdC4nLCAncC12YWx1ZScsIA0KICAgICAgICAgICAgICAgICAgICdWYXJpYW5jZScsJ3AtdmFsdWUnKQ0KdGFiX2RmKHJlcy5xZywgdGl0bGU9J1F1YWRyYXRpYyBQYXJhbWV0ZXIgRXN0aW1hdGVzJywNCiAgICAgICBmaWxlPSdRdWFkUGFyYW0uaHRtbCcpDQoNCmBgYA0KDQoNCmBgYHtyfQ0KcXVhZCA8LSBhcy5kYXRhLmZyYW1lKGZpdG1lYXN1cmVzKGdjLnEubWF0aC5maXQsIGMoImNmaSIsInNybXIiLCJybXNlYSIpKSkNCm5hbWVzKHF1YWQpWzFdPC0iUXVhZHJhdGljIEdyb3d0aCINCnF1YWQkaW5kZXggPC0gTkENCnF1YWRbMSwyXTwtIkNGSSINCnF1YWRbMiwyXTwtIlNSTVIiDQpxdWFkWzMsMl08LSJSTVNFQSINCnF1YWRbNCwyXTwtIkFJQyINCnF1YWRbNCwxXTwtQUlDKGdjLnEubWF0aC5maXQpDQpxdWFkWzUsMl08LSJCSUMiDQpxdWFkWzUsMV08LUJJQyhnYy5xLm1hdGguZml0KQ0KcXVhZCRgUXVhZHJhdGljIEdyb3d0aGAgPC0gcm91bmQocXVhZCRgUXVhZHJhdGljIEdyb3d0aGAsMykNCg0KdGFiX2RmKHF1YWQsIHRpdGxlPSdRdWFkcmF0aWMgR3Jvd3RoIEZpdCBTdGF0cycsIA0KICAgICAgIGZpbGUgPSAnUXVhZEZpdC5odG1sJykNCmBgYA0KDQogIA0KKioqICANCiMjI1NhbXBsZSBUZXh0IHdpdGggQ29kZSANCiAgDQpIZXJlIHdlIGNhbiBhbHNvIGJlZ2luIHRvIGludGVncmF0ZSBzb21lIG9mIHRoZSBSIGNvZGUgaW50byBvdXIgdGV4dC4gRXhhbXBsZTogDQoNClRoZSBtb2RlbCBzaG93ZWQgZ29vZCBmaXQgYmFzZWQgb24gbW9zdCBmaXQgbWVhc3VyZXMgKENGSSA9IGByIHJvdW5kKGZpdG1lYXN1cmVzKGdjLnEubWF0aC5maXQsICdjZmknKSwzKWAsIFJNU0VBID0gYHIgcm91bmQoZml0bWVhc3VyZXMoZ2MucS5tYXRoLmZpdCwgJ3NybXInKSwzKWAgYW5kIFNSTVIgPSBgciByb3VuZChmaXRtZWFzdXJlcyhnYy5xLm1hdGguZml0LCAncm1zZWEnKSwzKWApLiANCg0KIyMjQ29ycmVsYXRpb24gVGFibGUNCg0KTm93IHdlIGtub3cgdGhhdCBpdCBpcyBhbHdheXMgZ29vZCB0byBpbmNsdWRlIGEgY29ycmVsYXRpb24gdGFibGUgaW50byBvdXIgbWFudXNjcmlwdHMuIEJ1dCB3ZSBvZnRlbiBmb3JnZXQgdGhlbSB1bnRpbCB0aGUgZmluYWwgcGllY2UgYmVjYXVzZSB3ZSBkb24ndCB3YW50IHRvIGhhdmUgdG8gdHJhbnNmZXIgZXZlcnl0aGluZyBvdmVyISBXaG8gd291bGQgd2FudCB0byBkbyB0aGF0IChpcyB0aGF0IHdoYXQgdW5kZXJncmFkIFJBJ3MgYXJlIGZvcj8/KQ0KDQpUaGlzIGlzIG5vdyBhIHRoaW5nIG9mIHRoZSBwYXN0ISBSIGNhbiBkbyBpdCBmb3IgeW91LiANCmBgYHtyIGNvcnJlbGF0aW9uIHRhYmxlLCBldmFsPUZ9DQoNCiNEb24ndCBuZWVkIGFsbCBvZiB0aGUgdmFyaWFibGVzOyBvbmx5IHNlbGVjdCB0aGUgb25lcyB5b3Ugd2lsbCBiZSB1c2luZyANCg0KY29yIDwtIHNlbGVjdChkZiwgeDFfU0VTOng4X3dnaHQpDQoNCiNUaGlzIGNvcnJlbGF0aW9uIG1hdHJpeCBpcyB0b28gbGFyZ2UgZm9yIHRoZSBybWFya2Rvd24gZG9jdW1lbnQuIFBsZWFzZSBmaW5kIGl0IGluIHRoZSBmb2xkZXIgdGl0bGVkICJjb3JyZWxhdGlvbi5odG1sIg0KDQpzanQuY29ycihjb3Isc2hvdy5wID0gRkFMU0UsIG5hLmRlbGV0aW9uID0gJ3BhaXJ3aXNlJywgdHJpYW5nbGU9InVwcGVyIiwgDQogICAgICAgICAgIHRpdGxlID0gIkNvcnJlbGF0aW9ucyIsDQogICAgICAgICAgIENTUz1saXN0KGNzcy50aGVhZD0iYm9yZGVyLXRvcDpkb3VibGUgYmxhY2s7IGZvbnQtd2VpZ2h0Om5vcm1hbDsgZm9udC1zaXplOjAuOWVtOyIsDQogICAgICAgICBjc3MuZmlyc3R0YWJsZWNvbD0iZm9udC13ZWlnaHQ6bm9ybWFsOyBmb250LXNpemU6MC45ZW07IiksZmlsZT0iQ29ycmVsYXRpb24uaHRtbCIpDQpgYGANCg0KDQoNCiMjI1Bsb3RzDQoNCkl0IGlzIGFsd2F5cyBncmVhdCB0byB2aXN1YWxpemUgeW91ciBtb2RlbC4gVGhlIHBhY2thZ2UgW3NlbVBsb3RdKGh0dHA6Ly9zYWNoYWVwc2thbXAuY29tL2RvY3VtZW50YXRpb24vc2VtUGxvdC9zZW1QYXRocy5odG1sKSBjYW4gY29tZSBpbiB2ZXJ5IGhhbmR5LiBMZXQncyB0YWtlIGEgbG9vazogDQoNCmBgYHtyIHNlbVBsb3R9DQoNCnNlbVBhdGhzKGdjLnEubWF0aC5maXQsIGxheW91dD0ndHJlZTInKQ0KDQpgYGANCg0K</div>
 
 
 

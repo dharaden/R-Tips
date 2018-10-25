@@ -1,11 +1,147 @@
 ---
 title: "R-Tips Notebook"
-output: html_notebook
+output:
+  html_document:
+    df_print: paged
 ---
 
 ##Useful Links
 
-*  [R for Data Science]()
+*  [R for Data Science](https://r4ds.had.co.nz/)
 *  [Definitive Guide to Notebooks/Markdown](https://bookdown.org/yihui/rmarkdown/markdown-syntax.html) 
+*  [knitr options](http://yihui.name/knitr/options/)
 *  [R Markdown Templates](https://github.com/dr-harper/example-rmd-templates)
 *  [Github with Rstudio](http://happygitwithr.com/rstudio-git-github.html)
+*  [papaja](https://crsh.github.io/papaja_man/index.html)
+
+
+##Example
+
+First, load in all necessary packages as well as the data.  
+
+```{r Libraries, message=F}
+  #section 2.6.1 of Definitive Guide
+library(lavaan)
+library(tidyverse) #managing data
+library(broom) #cleaning output
+library(semPlot) #creating path diagrams
+library(sjPlot) #for plotting things
+df<-read.csv("ECLSK2011 PSYC 501.csv")
+```
+
+We will be using an example right from class. Examining a quadratic growth model.  
+
+```{r Quadratic Growth}
+gc.q.math<-"
+i=~ 1*x2_math + 1*x4_math + 1*x6_math + 1*x7_math + 1*x8_math
+sl=~ 0*x2_math + 1*x4_math + 2*x6_math + 3*x7_math + 4*x8_math
+sq=~ 0*x2_math + 1*x4_math + 4*x6_math + 9*x7_math + 16*x8_math
+"
+gc.q.math.fit<-growth(gc.q.math,data=df, missing="fiml")
+summary(gc.q.math.fit, fit.measures=T, standardized=T)
+```
+
+
+
+The output can be somewhat difficult to manage. That is where the `broom` package comes into play using the `tidy()` function. 
+
+
+```{r Tidy quadratic growth}
+
+tidygrow <- tidy(gc.q.math.fit)
+#View(tidygrow)
+
+#Create df to reflect just estimates
+est <- tidygrow %>%
+  filter(std.error>0) %>%
+  filter(!grepl('math', term)) %>% #removes all terms that have 'math' in the name
+  filter(!grepl('~~',term)) %>% #this is the line that evaluates the op variable
+  select(term, estimate, std.error, p.value, std.all)
+
+#create df to reflect only variance
+var <- tidygrow %>%
+  filter(std.error>0) %>%
+  filter(!grepl('math', term)) %>%
+  filter(grepl('~~', term)) %>%
+  select(term, estimate, std.error, p.value, std.all) %>%
+  slice(1:3) #only want the variance
+
+#Combine dataframes
+res.qg <- bind_cols(est,var) %>%
+  select(term, estimate, std.error, std.all, p.value, estimate1, p.value1)
+
+rownames(res.qg) <- c('Intercept','Linear Slope','Quadratic Slope')
+
+#rounding the estimates
+res.qg$estimate <- round(res.qg$estimate, 3)
+res.qg$std.error <- round(res.qg$std.error, 3)
+res.qg$std.all <- round(res.qg$std.all, 3)
+res.qg$estimate1 <- round(res.qg$estimate1, 3)
+
+res.qg <- rownames_to_column(res.qg) %>%
+  select(rowname, estimate, std.error, std.all, p.value, estimate1, p.value1)
+
+names(res.qg) <- c('', 'Estimate', 'Std. Error', 'Std. Est.', 'p-value', 
+                   'Variance','p-value')
+tab_df(res.qg, title='Quadratic Parameter Estimates',
+       file='QuadParam.html')
+
+```
+
+
+```{r}
+quad <- as.data.frame(fitmeasures(gc.q.math.fit, c("cfi","srmr","rmsea")))
+names(quad)[1]<-"Quadratic Growth"
+quad$index <- NA
+quad[1,2]<-"CFI"
+quad[2,2]<-"SRMR"
+quad[3,2]<-"RMSEA"
+quad[4,2]<-"AIC"
+quad[4,1]<-AIC(gc.q.math.fit)
+quad[5,2]<-"BIC"
+quad[5,1]<-BIC(gc.q.math.fit)
+quad$`Quadratic Growth` <- round(quad$`Quadratic Growth`,3)
+
+tab_df(quad, title='Quadratic Growth Fit Stats', 
+       file = 'QuadFit.html')
+```
+
+  
+***  
+###Sample Text with Code 
+  
+Here we can also begin to integrate some of the R code into our text. Example: 
+
+The model showed good fit based on most fit measures (CFI = `r round(fitmeasures(gc.q.math.fit, 'cfi'),3)`, RMSEA = `r round(fitmeasures(gc.q.math.fit, 'srmr'),3)` and SRMR = `r round(fitmeasures(gc.q.math.fit, 'rmsea'),3)`). 
+
+###Correlation Table
+
+Now we know that it is always good to include a correlation table into our manuscripts. But we often forget them until the final piece because we don't want to have to transfer everything over! Who would want to do that (is that what undergrad RA's are for??)
+
+This is now a thing of the past! R can do it for you. 
+```{r correlation table, eval=F}
+
+#Don't need all of the variables; only select the ones you will be using 
+
+cor <- select(df, x1_SES:x8_wght)
+
+#This correlation matrix is too large for the rmarkdown document. Please find it in the folder titled "correlation.html"
+
+sjt.corr(cor,show.p = FALSE, na.deletion = 'pairwise', triangle="upper", 
+           title = "Correlations",
+           CSS=list(css.thead="border-top:double black; font-weight:normal; font-size:0.9em;",
+         css.firsttablecol="font-weight:normal; font-size:0.9em;"),file="Correlation.html")
+```
+
+
+
+###Plots
+
+It is always great to visualize your model. The package [semPlot](http://sachaepskamp.com/documentation/semPlot/semPaths.html) can come in very handy. Let's take a look: 
+
+```{r semPlot}
+
+semPaths(gc.q.math.fit, layout='tree2')
+
+```
+
