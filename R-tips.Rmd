@@ -106,6 +106,29 @@ tab_df(quad, title='Quadratic Growth Fit Stats',
        file = 'QuadFit.html')
 ```
 
+
+This part gets a little overwhelming and can be difficult. What if we just make a function to do it for us??? 
+
+```{r function}
+fit_stats <- function(model, varname){
+  modelframe <- as.data.frame(fitmeasures(model, c("cfi","srmr","rmsea")))
+names(modelframe)[1]<-'varname'
+modelframe$index <- NA
+modelframe[1,2]<-"CFI"
+modelframe[2,2]<-"SRMR"
+modelframe[3,2]<-"RMSEA"
+modelframe[4,2]<-"AIC"
+modelframe[4,1]<-AIC(model)
+modelframe[5,2]<-"BIC"
+modelframe[5,1]<-BIC(model)
+modelframe$varname <- round(modelframe$varname,3)
+return(modelframe)
+}
+
+fit_stats(gc.q.math.fit, 'quadgrow')
+
+```
+
   
 ***  
 ###Sample Text with Code 
@@ -113,6 +136,8 @@ tab_df(quad, title='Quadratic Growth Fit Stats',
 Here we can also begin to integrate some of the R code into our text. Example: 
 
 The model showed good fit based on most fit measures (CFI = `r round(fitmeasures(gc.q.math.fit, 'cfi'),3)`, RMSEA = `r round(fitmeasures(gc.q.math.fit, 'srmr'),3)` and SRMR = `r round(fitmeasures(gc.q.math.fit, 'rmsea'),3)`). 
+
+THe reall awesome thing about this is that they are dynamic. If we were to run analyses again, and include another variable in the model, these values would update accourdingly! 
 
 ###Correlation Table
 
